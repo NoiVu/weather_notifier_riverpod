@@ -15,17 +15,27 @@ class WeatherSearchPage extends StatelessWidget {
       body: Container(
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(vertical: 16),
-        child: Consumer(
-          builder: (context, watch, child) {
-            final state = watch(weatherNotifierProvider.state);
-            if (state is WeatherInitail) {
-              return buildInitialInput();
-            } else if (state is WeatherLoading) {
-              return buildLoading();
-            } else if (state is WeatherLoaded) {
-              return buildColumnWithData(state.weather);
-            } else {
-              return buildInitialInput();
+        child: ProviderListener(
+          child: Consumer(
+            builder: (context, watch, child) {
+              final state = watch(weatherNotifierProvider.state);
+              if (state is WeatherInitail) {
+                return buildInitialInput();
+              } else if (state is WeatherLoading) {
+                return buildLoading();
+              } else if (state is WeatherLoaded) {
+                return buildColumnWithData(state.weather);
+              } else {
+                return buildInitialInput();
+              }
+            },
+          ),
+          provider: weatherNotifierProvider.state,
+          onChange: (context, state) {
+            if (state is WeatherError) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
             }
           },
         ),
